@@ -1,1 +1,1 @@
-Generate a trivia game for age group [age-group] with the topic of [topic]. Response format should be JSON with each item containing a question, a correct answer and 3 incorrect answers.
+Generate a trivia game for age group [age-group] with the topic of [topic]. Response format should be JSON array with each item containing a question, options array with 4 elements (1 correct answer followed by 3 incorrect answers), and correctAnswerIndex indicating which option is correct (0-3).

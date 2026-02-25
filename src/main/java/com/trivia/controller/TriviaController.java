@@ -3,9 +3,7 @@ package com.trivia.controller;
 import com.trivia.model.TriviaQuestion;
 import com.trivia.service.TriviaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,7 +15,9 @@ public class TriviaController {
     private TriviaService triviaService;
 
     @GetMapping("/questions")
-    public List<TriviaQuestion> getQuestions() {
-        return triviaService.getTriviaQuestions();
+    public List<TriviaQuestion> getQuestions(
+            @RequestParam(required = false, defaultValue = "mixed") String ageGroup,
+            @RequestParam(required = false, defaultValue = "general") String topic) {
+        return triviaService.getTriviaQuestions(ageGroup, topic);
     }
 }

@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let score = 0;
     let timer;
     let timeLeft;
+    let ageGroup, topic;
 
     // Initialize
     initGame();
@@ -46,10 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function initGame() {
         // Get room info from localStorage
         const roomNumber = localStorage.getItem('roomNumber') || '123456';
+        ageGroup = localStorage.getItem('ageGroup') || 'mixed';
+        topic = localStorage.getItem('topic') || 'general';
+
         roomCodeDisplay.textContent = roomNumber;
 
-        // Load questions from server
-        fetch('/api/trivia/questions')
+        // Load questions from server with parameters
+        fetch(`/api/trivia/questions?ageGroup=${encodeURIComponent(ageGroup)}&topic=${encodeURIComponent(topic)}`)
             .then(response => response.json())
             .then(data => {
                 questions = data;

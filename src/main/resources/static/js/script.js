@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Redirect to game page after 3 seconds
         setTimeout(() => {
-            window.location.href = '/game';
+            window.location.href = `/game?roomCode=${roomNumber}&ageGroup=${encodeURIComponent(ageGroup)}&topic=${encodeURIComponent(topic)}`;
         }, 3000);
     }
 
@@ -92,6 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // For now, just redirect to game page
         localStorage.setItem('roomNumber', roomCode);
-        window.location.href = '/game';
+        window.location.href = `/game?roomCode=${roomCode}`;
     }
 });
