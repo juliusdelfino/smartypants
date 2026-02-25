@@ -1,0 +1,1 @@
+Generate a trivia game for age group [age-group] with the topic of [topic]. Response format should be JSON with each item containing a question, a correct answer and 3 incorrect answers.

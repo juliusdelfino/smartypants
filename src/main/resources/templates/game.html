@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Game - In Progress</title>
+    <link rel="stylesheet" href="/css/game-style.css">
+</head>
+<body>
+<div class="container">
+    <!-- Lobby Screen -->
+    <div id="lobby-screen" class="screen">
+        <h1>Trivia Game Lobby</h1>
+        <div class="room-info">
+            <p>Room Code: <span id="room-code-display"></span></p>
+            <p>Players: <span id="player-count">1</span></p>
+        </div>
+        <button id="start-game-button" class="btn btn-start">Start Game</button>
+    </div>
+
+    <!-- Question Screen -->
+    <div id="question-screen" class="screen hidden">
+        <div class="timer-container">
+            <div class="timer-bar">
+                <div id="timer-progress" class="timer-progress"></div>
+            </div>
+            <div id="timer-text" class="timer-text">30</div>
+        </div>
+
+        <div class="question-container">
+            <h2 id="question-text">Loading question...</h2>
+        </div>
+
+        <div class="answers-container">
+            <div class="answer-option" data-index="0">
+                <div class="answer-letter">A</div>
+                <div class="answer-text" id="answer-0">Option 1</div>
+            </div>
+            <div class="answer-option" data-index="1">
+                <div class="answer-letter">B</div>
+                <div class="answer-text" id="answer-1">Option 2</div>
+            </div>
+            <div class="answer-option" data-index="2">
+                <div class="answer-letter">C</div>
+                <div class="answer-text" id="answer-2">Option 3</div>
+            </div>
+            <div class="answer-option" data-index="3">
+                <div class="answer-letter">D</div>
+                <div class="answer-text" id="answer-3">Option 4</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-screen" class="screen hidden">
+        <h1>Results</h1>
+        <div class="result-content">
+            <p>The correct answer was: <span id="correct-answer"></span></p>
+            <div id="leaderboard">
+                <h2>Leaderboard</h2>
+                <ol id="leaderboard-list">
+                    <li>You - <span id="score">0</span> points</li>
+                </ol>
+            </div>
+            <button id="next-question-btn" class="btn btn-next">Next Question</button>
+        </div>
+    </div>
+
+    <!-- Final Results Screen -->
+    <div id="final-results-screen" class="screen hidden">
+        <h1>Game Over!</h1>
+        <div class="final-result-content">
+            <h2>Your Final Score: <span id="final-score">0</span></h2>
+            <div id="final-leaderboard">
+                <h3>Final Leaderboard</h3>
+                <ol id="final-leaderboard-list">
+                    <li>You - <span id="final-player-score">0</span> points</li>
+                </ol>
+            </div>
+            <button id="play-again-btn" class="btn btn-restart">Play Again</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/game.js"></script>
+</body>
+</html>
