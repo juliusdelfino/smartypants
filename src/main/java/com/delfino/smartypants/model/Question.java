@@ -9,7 +9,6 @@ public class Question {
 
     // Legacy fields for backward compatibility
     private String correctAnswer;
-    private List<String> wrongAnswers;
 
     public Question() {}
 
@@ -17,7 +16,6 @@ public class Question {
     public Question(String question, String correctAnswer, List<String> wrongAnswers) {
         this.question = question;
         this.correctAnswer = correctAnswer;
-        this.wrongAnswers = wrongAnswers;
         // Build options list with correct answer first
         this.options = new java.util.ArrayList<>();
         this.options.add(correctAnswer);
@@ -73,24 +71,4 @@ public class Question {
         this.correctAnswer = correctAnswer;
     }
 
-    public List<String> getWrongAnswers() {
-        if (wrongAnswers != null) {
-            return wrongAnswers;
-        }
-        // Derive wrong answers from options
-        if (options != null) {
-            List<String> wrong = new java.util.ArrayList<>();
-            for (int i = 0; i < options.size(); i++) {
-                if (i != correctAnswerIndex) {
-                    wrong.add(options.get(i));
-                }
-            }
-            return wrong;
-        }
-        return null;
-    }
-
-    public void setWrongAnswers(List<String> wrongAnswers) {
-        this.wrongAnswers = wrongAnswers;
-    }
 }

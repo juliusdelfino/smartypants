@@ -40,8 +40,8 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        LOG.info("WebSocket connected: " + session.getId());
+    public void afterConnectionEstablished(WebSocketSession session) {
+        LOG.info("WebSocket connected: {}", session.getId());
     }
 
     @Override
@@ -119,12 +119,11 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
                 int qIndex = room.getCurrentQuestionIndex();
                 Question currentQuestion = questions.get(qIndex);
 
-                List<String> options = roomShuffledOptions.get(roomCode);
-                if (options == null) {
-                    options = new ArrayList<>(currentQuestion.getOptions());
-                    Collections.shuffle(options);
-                    roomShuffledOptions.put(roomCode, options);
-                }
+                List<String> options = roomShuffledOptions.computeIfAbsent(roomCode, k -> {
+                    List<String> opts = new ArrayList<>(currentQuestion.getOptions());
+                    Collections.shuffle(opts);
+                    return opts;
+                });
 
                 WebSocketMessage questionMsg = new WebSocketMessage();
                 questionMsg.setType(WebSocketMessage.NEW_QUESTION);
@@ -545,7 +544,7 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String roomCode = sessionRoomMap.remove(session.getId());
         String playerId = sessionPlayerMap.remove(session.getId());
         sessions.remove(session.getId());

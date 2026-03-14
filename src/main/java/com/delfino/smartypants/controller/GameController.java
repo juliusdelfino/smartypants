@@ -2,9 +2,7 @@ package com.delfino.smartypants.controller;
 
 import com.delfino.smartypants.model.CreateRoomRequest;
 import com.delfino.smartypants.model.Player;
-import com.delfino.smartypants.model.Question;
 import com.delfino.smartypants.model.Room;
-import com.delfino.smartypants.service.OllamaQuestionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,18 +13,9 @@ import java.util.*;
 @CrossOrigin(origins = "*")
 public class GameController {
 
-    private final OllamaQuestionService questionService;
-    private final Map<String, List<Question>> roomQuestions = new HashMap<>();
-
-    public GameController(OllamaQuestionService questionService) {
-        this.questionService = questionService;
-    }
-
     @PostMapping("/rooms")
     public ResponseEntity<Room> createRoom(@RequestBody CreateRoomRequest request) {
         Room room = Room.createRoom(request.getAgeGroup(), request.getTopic());
-        // Store room, questions will be generated when game starts via WebSocket
-        roomQuestions.put(room.getRoomCode(), new ArrayList<>());
         return ResponseEntity.ok(room);
     }
 

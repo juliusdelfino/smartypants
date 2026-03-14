@@ -7,7 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,24 +20,32 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
 public class OllamaQuestionService {
 
     private static final Logger LOG = LoggerFactory.getLogger(OllamaQuestionService.class);
-    
-    @Value("${ollama.url}")
-    private String ollamaUrl;
 
-    @Value("${ollama.model}")
-    private String ollamaModel;
+    private final String ollamaUrl;
+
+    private final String ollamaModel;
+
+    private final RestTemplate restTemplate;
 
     private static final String TRIVIA_MD_PATH = "trivia.md";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private String promptTemplate;
 
-    public OllamaQuestionService() {
+    public OllamaQuestionService(RestTemplate restTemplate,
+                                 @Value("${ollama.url}") String ollamaUrl,
+                                 @Value("${ollama.model}") String ollamaModel) {
+        this.restTemplate = restTemplate;
+        this.ollamaUrl = ollamaUrl;
+        this.ollamaModel = ollamaModel;
         loadPromptTemplate();
     }
 
@@ -42,7 +55,7 @@ public class OllamaQuestionService {
             Path path = Path.of(TRIVIA_MD_PATH);
             if (Files.exists(path)) {
                 promptTemplate = Files.readString(path, StandardCharsets.UTF_8);
-                LOG.info("Loaded prompt template from: " + path.toAbsolutePath());
+                LOG.info("Loaded prompt template from: {}", path.toAbsolutePath());
             } else {
                 // Fallback to classpath resource
                 ClassPathResource resource = new ClassPathResource(TRIVIA_MD_PATH);
@@ -59,17 +72,16 @@ public class OllamaQuestionService {
                     }
                 } else {
                     LOG.error("Could not find trivia.md, using fallback template");
-                    promptTemplate = getFallbackTemplate();
+                    promptTemplate = FALLBACK_TEMPLATE;
                 }
             }
         } catch (IOException e) {
             LOG.error("Error loading trivia.md: " + e.getMessage(), e);
-            promptTemplate = getFallbackTemplate();
+            promptTemplate = FALLBACK_TEMPLATE;
         }
     }
 
-    private String getFallbackTemplate() {
-        return """
+    private static final String FALLBACK_TEMPLATE = """
 You are a trivia question generator. Your task is to create engaging, accurate trivia questions.
 
 STRICT REQUIREMENTS:
@@ -87,9 +99,10 @@ STRICT REQUIREMENTS:
 5. All questions must be factual and verifiable.
 
 Generate exactly 10 questions now.""";
-    }
+    
 
     public List<Question> generateQuestions(String ageGroup, String topic) {
+        LOG.info("Generating questions from Ollama with params:  ageGroup = {}, topic = {}", ageGroup, topic);
         try {
 //            if (true) throw new IllegalArgumentException("Simulated error");
             String prompt = buildPrompt(ageGroup, topic);
@@ -103,7 +116,7 @@ Generate exactly 10 questions now.""";
 
     private String buildPrompt(String ageGroup, String topic) {
         if (promptTemplate == null) {
-            promptTemplate = getFallbackTemplate();
+            promptTemplate = FALLBACK_TEMPLATE;
         }
         return promptTemplate
                 .replace("[topic]", topic)
@@ -111,37 +124,31 @@ Generate exactly 10 questions now.""";
     }
 
     private String callOllama(String prompt) throws IOException {
-        java.net.URL url = new java.net.URL(ollamaUrl);
-        java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-        conn.setConnectTimeout(60000);
-        conn.setReadTimeout(120000);
 
-        String jsonInput = String.format(
-            "{\"model\": \"%s\", \"prompt\": %s, \"stream\": false}",
-            ollamaModel,
-            escapeJsonString(prompt)
+        Map<String, Object> body = Map.of(
+                "model", ollamaModel,
+                "prompt", prompt,
+                "stream", false
         );
 
-        try (var os = conn.getOutputStream()) {
-            os.write(jsonInput.getBytes(StandardCharsets.UTF_8));
-        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(System.getenv("OLLAMA_API_KEY"));
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-        StringBuilder response = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                response.append(line);
-            }
-        }
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                ollamaUrl,
+                request,
+                String.class
+        );
 
-        // Parse the Ollama response to extract the generated text
-        String responseText = response.toString().replace("```json", "").replace("```", "");
+        String responseText = response.getBody();
+        String dateTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(ZonedDateTime.now(ZoneOffset.UTC));
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(Path.of("./data/ollama_request_" + dateTime + ".json").toFile(), objectMapper.readTree(responseText));
+        responseText = responseText.replace("```json", "").replace("```", "");
+
         // Ollama returns a JSON with "response" field
-        Map<String, Object> ollamaResponse = objectMapper.readValue(responseText, new TypeReference<Map<String, Object>>() {});
+        Map<String, Object> ollamaResponse = objectMapper.readValue(responseText, new TypeReference<>() {});
         Object generated = ollamaResponse.get("response");
         return generated != null ? generated.toString() : "[]";
     }
@@ -151,7 +158,7 @@ Generate exactly 10 questions now.""";
             // Clean up the response - remove markdown code blocks if present
             String cleaned = response.trim();
             if (cleaned.startsWith("```")) {
-                int start = cleaned.indexOf("[") != -1 ? cleaned.indexOf("[") : cleaned.indexOf("\n");
+                int start = cleaned.contains("[") ? cleaned.indexOf("[") : cleaned.indexOf("\n");
                 int end = cleaned.lastIndexOf("```");
                 if (start != -1 && end != -1 && end > start) {
                     cleaned = cleaned.substring(start, end).trim();
@@ -169,7 +176,7 @@ Generate exactly 10 questions now.""";
                 cleaned = cleaned.substring(arrayStart, arrayEnd + 1);
             }
 
-            List<OllamaQuestion> ollamaQuestions = objectMapper.readValue(cleaned, new TypeReference<List<OllamaQuestion>>() {});
+            List<OllamaQuestion> ollamaQuestions = objectMapper.readValue(cleaned, new TypeReference<>() {});
             
             if (ollamaQuestions == null || ollamaQuestions.isEmpty()) {
                 return Collections.emptyList();
@@ -185,17 +192,9 @@ Generate exactly 10 questions now.""";
             return questions;
         } catch (Exception e) {
             LOG.error("Failed to parse questions: " + e.getMessage(), e);
-            LOG.info("Raw response: " + response);
+            LOG.info("Raw response: {}", response);
             return Collections.emptyList();
         }
-    }
-
-    private String escapeJsonString(String s) {
-        return "\"" + s.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t") + "\"";
     }
 
     private List<Question> getFallbackQuestions(String ageGroup, String topic) {
