@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: smartypants
+  thymeleaf:
+    cache: false
+server:
+  port: 8080
+ollama:
+  url: https://gpt.jdelfino.com/ollama/api/generate
+  model: gemma3n:latest
