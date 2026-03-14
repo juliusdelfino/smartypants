@@ -1,0 +1,35 @@
+Configuration:
+  status: info
+  monitorInterval: 60
+
+  Properties:
+    Property:
+      - name: LOG_PATTERN
+        value: "%d{ISO8601} %-5p [%t] [%-40.40c{1.}] %m%n"
+
+  Appenders:
+    RollingFile:
+      - name: fileLogger
+        fileName: "logs/smartypants.log"
+        filePattern: "logs/smartypants-%d{yyyy-MM-dd}.%i.log.gz"
+        append: true
+        bufferedIO: true
+        bufferSize: 8192
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: 10MB
+        DefaultRolloverStrategy:
+          max: 99
+        PatternLayout:
+          pattern: "${LOG_PATTERN}"
+    Console:
+      - name: consoleLogger
+        PatternLayout:
+          pattern: "${LOG_PATTERN}"
+
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: fileLogger
+        - ref: consoleLogger

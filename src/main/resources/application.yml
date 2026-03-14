@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: smartypants
+  thymeleaf:
+    cache: false
+server:
+  port: 8080
+ollama:
+  url: http://ludwig:11434/api/generate
+  model: gemma3n:latest
