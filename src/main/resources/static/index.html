@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smarty Pants - Trivia</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div id="app" class="centered">
+    <div id="lobby" class="card">
+      <div id="mainMenu">
+        <img src="/smarty-big-no-bg2.png" alt="Smarty Pants" class="logo" width="500px" />
+        <div class="row big-gap">
+          <button id="createBtn">Create Room</button>
+          <button id="joinBtn">Join Room</button>
+        </div>
+      </div>
+
+      <div id="createForm" class="hidden form-vertical">
+        <img src="/smarty-big-no-bg2.png" alt="Smarty Pants" class="logo" width="200px" />
+        <label>Age group</label>
+        <div id="ageGrid" class="card-grid">
+          <div class="option-card" data-value="All ages">All ages</div>
+          <div class="option-card" data-value="Kids">Kids</div>
+          <div class="option-card" data-value="Teens">Teens</div>
+          <div class="option-card" data-value="Young Adults">Young Adults</div>
+          <div class="option-card" data-value="Adults">Adults</div>
+          <div class="option-card" data-value="Seniors">Seniors</div>
+        </div>
+
+        <label>Topic</label>
+        <div id="topicGrid" class="card-grid">
+          <div class="option-card" data-value="General Knowledge">General Knowledge</div>
+          <div class="option-card" data-value="Science">Science</div>
+          <div class="option-card" data-value="History">History</div>
+          <div class="option-card" data-value="Sports">Sports</div>
+          <div class="option-card" data-value="Geography">Geography</div>
+          <div class="option-card" data-value="Movies & TV">Movies & TV</div>
+          <div class="option-card" data-value="Music">Music</div>
+          <div class="option-card" data-value="Technology">Technology</div>
+          <div class="option-card" data-value="Literature">Literature</div>
+          <div class="option-card custom" id="customTopicCard" data-value="Custom">Custom</div>
+        </div>
+
+        <div class="row">
+          <button id="createRoomSubmit">Create</button>
+          <button id="createRoomCancel">Go Back</button>
+        </div>
+      </div>
+
+      <div id="joinForm" class="hidden form-vertical">
+        <img src="/smarty-big-no-bg2.png" alt="Smarty Pants" class="logo" width="200px" />
+        <label>Room ID <input id="joinRoomId" maxlength="6" class="big-input" /></label>
+        <label>Your name <input id="joinRoomName" maxlength="20" class="big-input" /></label>
+        <div class="row">
+          <button id="joinRoomSubmit">Join</button>
+          <button id="joinRoomCancel">Go Back</button>
+        </div>
+      </div>
+
+      <div id="roomInfo" class="hidden form-vertical">
+        <div class="row between">
+          <img src="/smarty-big-no-bg2.png" alt="Smarty Pants" class="logo" width="300px" />
+          <div id="roomInfoRight">
+            <div style="font-size: 1.5rem">Invite your friends to join this room! <span id="roomIdDisplay"></span></div>
+            <div>Age group: <span id="roomAgeGroup"></span></div>
+            <div>Topic: <span id="roomTopic"></span></div>
+          </div>
+        </div>
+        <div>
+          <h4>Players</h4>
+          <div id="playerList" class="room-players"></div>
+        </div>
+        <div class="row">
+          <button id="startBtn">Start</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="game" class="hidden">
+      <div id="questionCard" class="card transition">
+        <div class="row between">
+          <div id="questionNumber" class="small">Question 1/5</div>
+          <div id="timer" class="small timer">30</div>
+        </div>
+        <h2 id="questionText">Question text</h2>
+        <div id="choices" class="choices"></div>
+        <div id="nextWrap" class="row">
+          <button id="nextBtn">Next</button>
+        </div>
+        <div id="endActions" class="hidden form-vertical">
+          <div id="finalScore" class="big">Score: 0 / 5</div>
+          <div id="finalBoard" class="final-board"></div>
+          <div class="row">
+            <button id="backBtn">Back to Lobby</button>
+          </div>
+        </div>
+      </div>
+      <div id="top5" class="room-top5"></div>
+    </div>
+  </div>
+
+  <!-- Custom topic modal -->
+  <div id="topicModal" class="hidden modal">
+    <div class="modal-content card">
+      <h3>Enter custom topic</h3>
+      <input id="customTopicInput" class="big-input" placeholder="e.g. Space exploration" />
+      <div class="row">
+        <button id="topicModalOk">OK</button>
+        <button id="topicModalCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

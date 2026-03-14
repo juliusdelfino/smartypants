@@ -1,0 +1,4 @@
+Strictly verify that the topic 'Santa Claus' is well-known, wholesome and based on facts, otherwise return empty array.
+Generate a trivia game for age group kids with the mentioned topic.
+Response format should strictly be JSON array with each item containing a question,
+options array with 4 elements (1 correct answer followed by 3 incorrect answers), and correctAnswerIndex indicating which option is correct (0-3).

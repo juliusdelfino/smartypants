@@ -1,0 +1,28 @@
+[
+  {
+    "question": "What is the capital of France?",
+    "options": ["Paris","London","Berlin","Madrid"],
+    "correctAnswerIndex": 0
+  },
+  {
+    "question": "Which planet is known as the Red Planet?",
+    "options": ["Mars","Venus","Jupiter","Saturn"],
+    "correctAnswerIndex": 0
+  },
+  {
+    "question": "Who wrote 'Romeo and Juliet'?",
+    "options": ["William Shakespeare","Charles Dickens","Jane Austen","Mark Twain"],
+    "correctAnswerIndex": 0
+  },
+  {
+    "question": "What is H2O commonly known as?",
+    "options": ["Water","Oxygen","Hydrogen","Salt"],
+    "correctAnswerIndex": 0
+  },
+  {
+    "question": "What is the largest mammal?",
+    "options": ["Blue whale","Elephant","Giraffe","Hippopotamus"],
+    "correctAnswerIndex": 0
+  }
+]
+
