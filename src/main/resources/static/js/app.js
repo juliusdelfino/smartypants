@@ -98,7 +98,8 @@
 
     // WebSocket Functions
     function connectWebSocket(onConnect) {
-        const wsUrl = `ws://${window.location.host}/ws/game`;
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${protocol}//${window.location.host}/ws/game`;
         ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
