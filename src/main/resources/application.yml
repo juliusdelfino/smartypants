@@ -3,8 +3,15 @@ spring:
     name: smartypants
   thymeleaf:
     cache: false
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          no-cache: true
+          must-revalidate: true
+          max-age: 0
 server:
-  port: 8080
+  port: 8086
 ollama:
   url: https://gpt.jdelfino.com/ollama/api/generate
   model: gemma3n:latest
